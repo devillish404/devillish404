@@ -128,11 +128,11 @@ X-Note: 16 bytes of padding are reserved for it, see header
 ```text
 Login: devillish404                  Name: Nidesh Ahilan
 Directory: /bits-pilani/cs/year-3    Shell: /bin/bash
+Mail: nidesh.ahilan@proton.me
 Plan: see ~/.plan above
 ```
 
-**[Codeforces](https://codeforces.com/profile/NideshCanCode)**
-<!-- add when ready: · **[LinkedIn](URL)** · **[Email](mailto:ADDRESS)** -->
+**[LinkedIn](https://www.linkedin.com/in/nidesh-ahilan-4aa77131a/)** · **[Email](mailto:nidesh.ahilan@proton.me)** · **[Codeforces](https://codeforces.com/profile/NideshCanCode)**
 
 <br>
 
