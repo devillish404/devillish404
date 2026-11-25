@@ -1,0 +1,33 @@
+name: refresh profile numbers
+
+on:
+  schedule:
+    - cron: "23 3 * * 1"   # Mondays 03:23 UTC
+  workflow_dispatch:
+  push:
+    paths: ["data.json", "scripts/render.py"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch Codeforces rating and re-render SVGs
+        run: python3 scripts/render.py --fetch
+      - name: Commit if anything changed
+        run: |
+          if git diff --quiet; then
+            echo "nothing changed"; exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A data.json assets README.md
+          git commit -m "chore: refresh profile numbers"
+          git push
