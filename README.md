@@ -5,6 +5,8 @@
 -->
 
 <picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/header-compact-dark.svg">
+  <source media="(max-width: 600px) and (prefers-color-scheme: light)" srcset="assets/header-compact-light.svg">
   <source media="(prefers-color-scheme: dark)" srcset="assets/header-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="assets/header-light.svg">
   <img src="assets/header-dark.svg" width="100%" alt="Terminal window. whoami prints: Nidesh Ahilan, devillish404, Computer Science 3rd year at BITS Pilani. I build software that fails closed. Next stop: low-level C++. Below it, pahole draws a 64-byte struct devillish404 as one cache line: identity, four shipped projects, a Codeforces rating, two learning topics, and 16 bytes of padding reserved for an order book engine that isn't built yet.">
@@ -17,6 +19,8 @@ That's the thread I'm following down the stack, toward low-level C++ and the int
 <br>
 
 <picture>
+  <source media="(max-width: 600px) and (prefers-color-scheme: dark)" srcset="assets/audit-compact-dark.svg">
+  <source media="(max-width: 600px) and (prefers-color-scheme: light)" srcset="assets/audit-compact-light.svg">
   <source media="(prefers-color-scheme: dark)" srcset="assets/audit-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="assets/audit-light.svg">
   <img src="assets/audit-dark.svg" width="100%" alt="Audit table. paypilot: executed, 42 of 70 commits, public repo, 29 test files. bosm: executed, frontend lead, ₹80L+ edition, private repo. code_duel: executed, custom Elo rating, private repo. entity_res: executed, Indic transliteration, public fork. cf_rating: reconciled from the Codeforces API weekly. order_book: pending, no evidence yet, so not claimed. Summary: 0 claims without evidence.">

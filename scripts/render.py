@@ -56,7 +56,7 @@ def t(x, y, s, fill, size=14, cls="m", weight=None, anchor=None, extra=""):
     return f'<text x="{x}" y="{y}" class="{cls}" font-size="{size}" fill="{fill}"{w}{a}{extra}>{s}</text>'
 
 
-def window(c, h, title, body, label):
+def window(c, h, title, body, label, W=W):
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{h}" viewBox="0 0 {W} {h}" role="img" aria-label="{escape(label, {chr(34): '&quot;'})}">
 <title>{escape(label)}</title>
 {STYLE}
@@ -70,8 +70,8 @@ def window(c, h, title, body, label):
 """
 
 
-def prompt(c, y, cmd):
-    return t(40, y, f'<tspan fill="{c["green"]}">❯</tspan> <tspan fill="{c["fg"]}">{escape(cmd)}</tspan>', c["fg"], 15)
+def prompt(c, y, cmd, x=40, size=15):
+    return t(x, y, f'<tspan fill="{c["green"]}">❯</tspan> <tspan fill="{c["fg"]}">{escape(cmd)}</tspan>', c["fg"], size)
 
 
 def header(d, c):
@@ -173,6 +173,63 @@ def footer(d, c):
                   f'Terminal session ends: logout, numbers verified {d["verified"]}.')
 
 
+# ---- compact variants: served to narrow screens (phones) via <picture media="(max-width: 600px)">
+CW = 380
+
+
+def header_compact(d, c):
+    cf, x = d["cf"], 20
+    out = [prompt(c, 68, "whoami", x, 14)]
+    out.append(t(x, 106, escape(d["name"]), c["fg"], 30, cls="s", weight="700"))
+    out.append(t(x, 132, f'<tspan fill="{c["blue"]}">{escape(d["login"])}</tspan> · BITS Pilani', c["muted"], 14, cls="s"))
+    out.append(t(x, 152, "Computer Science, 3rd year", c["muted"], 14, cls="s"))
+    first, _, rest = d["tagline"].partition(". ")
+    out.append(t(x, 184, escape(first + ("." if rest else "")), c["fg"], 15, cls="s"))
+    if rest:
+        out.append(t(x, 206, escape(rest), c["fg"], 15, cls="s"))
+    out.append(prompt(c, 248, "pahole -C devillish404", x, 14))
+    bw, top, hgt = (CW - 2 * x) / 64, 270, 44
+    segs = [(0, 16, "identity"), (16, 32, "shipped"), (32, 36, ""), (36, 48, "learn")]
+    for i, (a, b, name) in enumerate(segs):
+        fill, ink = c["seg"][i]
+        out.append(f'<rect x="{x + a * bw}" y="{top}" width="{(b - a) * bw}" height="{hgt}" fill="{fill}"/>')
+        if name:
+            out.append(t(x + a * bw + 6, top + 27, name, ink, 11, weight="700"))
+    out.append(f'<rect x="{x + 48 * bw}" y="{top}" width="{16 * bw}" height="{hgt}" fill="url(#hatch)"/>')
+    out.append(t(x + 48 * bw + 6, top + 27, "404", c["fg"], 11, weight="700"))
+    out.append(f'<rect x="{x}" y="{top}" width="{64 * bw}" height="{hgt}" fill="none" stroke="{c["border"]}" rx="3"/>')
+    out.append(t(x, top + 74, f'<tspan fill="{c["orange"]}">cf_rating</tspan>  {cf["rating"]} · {cf["rank"]}', c["fg"], 13))
+    out.append(t(x, top + 98, f'<tspan fill="{c["muted"]}">__pad[16]</tspan>  reserved: order_book', c["fg"], 13))
+    out.append(prompt(c, top + 140, "", x, 14))
+    out.append(f'<rect class="cur" x="{x + 17}" y="{top + 128}" width="8" height="16" fill="{c["fg"]}"/>')
+    defs = (f'<defs><pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">'
+            f'<rect width="8" height="8" fill="{c["hatch"][0]}"/><rect width="4" height="8" fill="{c["hatch"][1]}"/></pattern></defs>')
+    label = (f'Terminal: whoami prints {d["name"]}, {d["school"]}. "{d["tagline"]}" A 64-byte cache line: identity, '
+             f'shipped projects, Codeforces rating {cf["rating"]}, learning, and padding reserved for an unbuilt order book engine.')
+    return window(c, top + 166, "~ — bash", defs + "\n".join(out), label, W=CW)
+
+
+def audit_compact(d, c):
+    cf, x = d["cf"], 20
+    state_col = {"EXECUTED": c["green"], "RECONCILED": c["blue"], "PENDING": c["orange"]}
+    out = [prompt(c, 68, "audit verify --all", x, 14)]
+    y, counts = 104, {}
+    for r in d["audit"]:
+        ev = r["evidence"].format(cf_rating=cf["rating"], cf_rank=cf["rank"])
+        counts[r["state"]] = counts.get(r["state"], 0) + 1
+        out.append(t(x, y, escape(r["item"]), c["fg"], 14))
+        out.append(t(CW - x, y, r["state"], state_col.get(r["state"], c["fg"]), 13, weight="700", anchor="end"))
+        out.append(t(x, y + 19, escape(ev), c["muted"], 11.5))
+        y += 46
+    out.append(f'<line x1="{x}" y1="{y - 14}" x2="{CW - x}" y2="{y - 14}" stroke="{c["border"]}"/>')
+    out.append(t(x, y + 8, f'<tspan fill="{c["green"]}">✓</tspan> {counts.get("EXECUTED", 0)} executed · {counts.get("PENDING", 0)} pending', c["muted"], 13))
+    out.append(t(x, y + 30, "0 claims without evidence", c["fg"], 13, weight="700"))
+    label = "Audit table. " + "; ".join(
+        f'{r["item"]}: {r["state"]}, {r["evidence"].format(cf_rating=cf["rating"], cf_rank=cf["rank"])}' for r in d["audit"]
+    ) + ". 0 claims without evidence."
+    return window(c, y + 52, "audit", "\n".join(out), label, W=CW)
+
+
 def fetch_cf(d):
     url = f'https://codeforces.com/api/user.info?handles={d["cf"]["handle"]}'
     try:
@@ -208,7 +265,8 @@ def main():
         DATA.write_text(json.dumps(d, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     ASSETS.mkdir(exist_ok=True)
     for mode, c in THEMES.items():
-        for name, fn in (("header", header), ("audit", audit), ("footer", footer)):
+        for name, fn in (("header", header), ("audit", audit), ("footer", footer),
+                         ("header-compact", header_compact), ("audit-compact", audit_compact)):
             (ASSETS / f"{name}-{mode}.svg").write_text(fn(d, c), encoding="utf-8")
     sync_readme(d)
 
