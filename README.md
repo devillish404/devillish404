@@ -23,7 +23,7 @@ That's the thread I'm following down the stack, toward low-level C++ and the int
   <source media="(max-width: 600px) and (prefers-color-scheme: light)" srcset="assets/audit-compact-light.svg">
   <source media="(prefers-color-scheme: dark)" srcset="assets/audit-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="assets/audit-light.svg">
-  <img src="assets/audit-dark.svg" width="100%" alt="Audit table. paypilot: executed, 42 of 70 commits, public repo, 29 test files. bosm: executed, frontend lead, ₹80L+ edition, private repo. code_duel: executed, custom Elo rating, private repo. entity_res: executed, Indic transliteration, public fork. cf_rating: reconciled from the Codeforces API weekly. order_book: pending, no evidence yet, so not claimed. Summary: 0 claims without evidence.">
+  <img src="assets/audit-dark.svg" width="100%" alt="Audit table. paypilot, bosm, code_duel, entity_res: executed. cf_rating: reconciled weekly from the Codeforces API. order_book: pending, not claimed. Summary: 0 claims without evidence.">
 </picture>
 
 <sub>Every line on this page maps to a repo, a commit count or a public API. Anything I can't back up yet is marked <b>PENDING</b> rather than listed as a skill. That rule comes from PayPilot, below.</sub>

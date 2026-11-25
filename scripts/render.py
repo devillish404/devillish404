@@ -140,18 +140,16 @@ def audit(d, c):
     state_col = {"EXECUTED": c["green"], "RECONCILED": c["blue"], "PENDING": c["orange"]}
     out = [prompt(c, 72, "devillish404 audit verify --all")]
     out.append(t(40, 110, "ITEM", c["faint"], 12))
-    out.append(t(200, 110, "STATE", c["faint"], 12))
-    out.append(t(340, 110, "EVIDENCE", c["faint"], 12))
+    out.append(t(W - 40, 110, "STATE", c["faint"], 12, anchor="end"))
     out.append(f'<line x1="40" y1="120" x2="{W-40}" y2="120" stroke="{c["border"]}"/>')
     y = 146
     counts = {}
     for i, r in enumerate(d["audit"]):
-        ev = r["evidence"].format(cf_rating=cf["rating"], cf_rank=cf["rank"])
         counts[r["state"]] = counts.get(r["state"], 0) + 1
         out.append(f'<g class="in" style="animation-delay:{0.08 * i:.2f}s">'
                    + t(40, y, escape(r["item"]), c["fg"], 14)
-                   + t(200, y, r["state"], state_col.get(r["state"], c["fg"]), 14, weight="700")
-                   + t(340, y, escape(ev), c["muted"], 14) + "</g>")
+                   + f'<line x1="{60 + 8.6 * len(r["item"])}" y1="{y - 4}" x2="{W - 60 - 8.6 * len(r["state"])}" y2="{y - 4}" stroke="{c["border"]}" stroke-dasharray="2 6"/>'
+                   + t(W - 40, y, r["state"], state_col.get(r["state"], c["fg"]), 14, weight="700", anchor="end") + "</g>")
         y += 28
     out.append(f'<line x1="40" y1="{y - 10}" x2="{W-40}" y2="{y - 10}" stroke="{c["border"]}"/>')
     ex, pe = counts.get("EXECUTED", 0), counts.get("PENDING", 0)
@@ -159,7 +157,7 @@ def audit(d, c):
                  f'<tspan fill="{c["fg"]}" font-weight="700">0 claims without evidence</tspan>', c["muted"], 14))
     h = y + 46
     label = "Audit table. " + "; ".join(
-        f'{r["item"]}: {r["state"]}, {r["evidence"].format(cf_rating=cf["rating"], cf_rank=cf["rank"])}' for r in d["audit"]
+        f'{r["item"]}: {r["state"]}' for r in d["audit"]
     ) + ". Summary: 0 claims without evidence."
     return window(c, h, "audit — paypilot-style verify", "\n".join(out), label)
 
@@ -215,17 +213,15 @@ def audit_compact(d, c):
     out = [prompt(c, 68, "audit verify --all", x, 14)]
     y, counts = 104, {}
     for r in d["audit"]:
-        ev = r["evidence"].format(cf_rating=cf["rating"], cf_rank=cf["rank"])
         counts[r["state"]] = counts.get(r["state"], 0) + 1
         out.append(t(x, y, escape(r["item"]), c["fg"], 14))
         out.append(t(CW - x, y, r["state"], state_col.get(r["state"], c["fg"]), 13, weight="700", anchor="end"))
-        out.append(t(x, y + 19, escape(ev), c["muted"], 11.5))
-        y += 46
-    out.append(f'<line x1="{x}" y1="{y - 14}" x2="{CW - x}" y2="{y - 14}" stroke="{c["border"]}"/>')
+        y += 32
+    out.append(f'<line x1="{x}" y1="{y - 12}" x2="{CW - x}" y2="{y - 12}" stroke="{c["border"]}"/>')
     out.append(t(x, y + 8, f'<tspan fill="{c["green"]}">✓</tspan> {counts.get("EXECUTED", 0)} executed · {counts.get("PENDING", 0)} pending', c["muted"], 13))
     out.append(t(x, y + 30, "0 claims without evidence", c["fg"], 13, weight="700"))
     label = "Audit table. " + "; ".join(
-        f'{r["item"]}: {r["state"]}, {r["evidence"].format(cf_rating=cf["rating"], cf_rank=cf["rank"])}' for r in d["audit"]
+        f'{r["item"]}: {r["state"]}' for r in d["audit"]
     ) + ". 0 claims without evidence."
     return window(c, y + 52, "audit", "\n".join(out), label, W=CW)
 
