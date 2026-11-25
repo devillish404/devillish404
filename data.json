@@ -13,22 +13,22 @@
     {
       "item": "paypilot",
       "state": "EXECUTED",
-      "evidence": "42 of 70 commits · public repo · 29 test files"
+      "evidence": "public repo"
     },
     {
       "item": "bosm",
       "state": "EXECUTED",
-      "evidence": "frontend lead · ₹80L+ edition · private repo"
+      "evidence": "BOSM 2026 site · private org repo"
     },
     {
       "item": "code_duel",
       "state": "EXECUTED",
-      "evidence": "custom Elo rating · private repo"
+      "evidence": "5 services · private org repo"
     },
     {
       "item": "entity_res",
       "state": "EXECUTED",
-      "evidence": "Indic transliteration · public fork"
+      "evidence": "public fork"
     },
     {
       "item": "cf_rating",

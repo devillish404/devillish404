@@ -12,7 +12,7 @@
   <img src="assets/header-dark.svg" width="100%" alt="Terminal window. whoami prints: Nidesh Ahilan, devillish404, Computer Science 3rd year at BITS Pilani. I build software that fails closed. Next stop: low-level C++. Below it, pahole draws a 64-byte struct devillish404 as one cache line: identity, four shipped projects, a Codeforces rating, two learning topics, and 16 bytes of padding reserved for an order book engine that isn't built yet.">
 </picture>
 
-I'm a third-year Computer Science student at BITS Pilani. Most of what I've shipped so far is product engineering: the official website of BOSM, BITS Pilani's sports fest, and a 1v1 Codeforces duel platform. The work I'm proudest of is about **correctness when things go wrong**: a payments engine you can `kill -9` mid-payment and it still won't pay twice.
+I'm a third-year Computer Science student at BITS Pilani. Most of what I've shipped so far is product engineering: the official BOSM 2026 website (BITS Pilani's sports fest) and a real-time 1v1 coding-duel platform. The work I'm proudest of is about **correctness when things go wrong**: a payments engine you can `kill -9` mid-payment and it still won't pay twice.
 
 That's the thread I'm following down the stack, toward low-level C++ and the internals of LLM inference. I'm aiming at **ML and systems** roles.
 
@@ -34,38 +34,46 @@ That's the thread I'm following down the stack, toward low-level C++ and the int
 
 ### `paypilot/` · fail-closed accounts payable
 
-**[devillish404/paypilot](https://github.com/devillish404/paypilot)** · Python · SQLite · team of 3 · hackathon prototype
+**[devillish404/paypilot](https://github.com/devillish404/paypilot)** · Python · SQLite · ContextCon hackathon
 
-An accounts-payable engine for mid-size Indian logistics companies. It matches bank lines and invoices to vendors, runs deterministic checks, queues payments for human approval, pays through a provider interface (a deterministic `FakeProvider`, plus a RazorpayX test-mode adapter) and keeps books an auditor can replay. It has one rule: **if it can't prove something, it stops.**
+An accounts-payable engine for mid-size Indian logistics (3PL) companies. It takes a request (post these bank lines, pay these invoices, reconcile this statement) and checks every line against the client's own vendor master, purchase orders and payment history. Deterministic checks catch duplicate invoices, PO mismatches, look-alike vendors and bank-detail changes. Payments wait for human approval and go out through a provider interface: a deterministic `FakeProvider`, plus a RazorpayX Payouts test-mode adapter. Every item ends in exactly one outcome: `POSTED`, `PAID`, `HELD`, `CANNOT_VERIFY`, `REJECTED` or `PAYMENT_UNCERTAIN`. No LLM makes any decision.
 
-What made it hard:
+How it stays correct:
 
-- **At-most-once payments, even through crashes.** Every item moves through a state machine updated with compare-and-swap on `(state, version)`, and the audit row is written in the same transaction. Named crash points (`PAYPILOT_CRASH_AT=…`) kill the process at an exact step, and `resume` picks up without paying twice.
-- **"I don't know" is a state, not an error.** A lost provider reply becomes `PAYMENT_UNCERTAIN` and blocks until reconciled. Only a failed *read-only* lookup is safe to retry.
-- **Books that balance.** A double-entry journal, plus `audit verify` to replay every decision. A bank return after a confirmed success posts a `REVERSAL` and contains the vendor.
-- **Approvals that can go stale.** An approval is bound to a hash of the decision it approved. If the data underneath changes, the approval is refused.
-- **Untrusted text is shown, never interpreted.** Invoice text goes through markup escaping and control/bidi-character stripping, so a vendor name can't forge a terminal line.
-- **Cost ledger.** Budget is reserved *before* every paid API call. A cost that can't be priced is recorded as `UNKNOWN`, not zero.
+- **At-most-once payments, even through crashes.** Item state changes are compare-and-swap on `(state, version)`, and the audit row is written in the same transaction. Named crash points (`PAYPILOT_CRASH_AT=…`) kill the process at an exact step, and `resume` picks up without paying twice.
+- **"I don't know" is a state, not an error.** A lost provider reply becomes `PAYMENT_UNCERTAIN` and blocks until reconciled.
+- **Books that balance.** A double-entry journal, plus `audit verify` to replay every decision. A bank return after a confirmed payout posts a `REVERSAL` and contains the vendor.
+- **Approvals that can go stale.** Each approval is bound to a hash of the decision. If the data underneath changes, the approval is refused.
+- **Untrusted input stays inert.** Vendor text is escaped and stripped of control and bidi characters before it reaches the terminal.
+- **Cost ledger.** Budget is reserved before every paid API call. Unpriced calls are recorded as `UNKNOWN`, not zero.
 
-**My part:** 42 of the repo's 70 commits. I wrote the design plan, the core (config, DB, state machine, journal, resumable pipeline), approvals, payments and recovery, reconciliation, the CLI and the read-only dashboard. The 21-scene demo kills the process mid-payment, loses a provider reply and stages a bank-change fraud attempt, all against the FakeProvider in about two minutes.
+A 21-scene demo walks through all of it: month-end posting, duplicate and fraud attempts, a `kill -9` mid-payment, a lost reply, a bank return and a statement reconcile. A read-only dashboard shows the books live.
 
-### `bosm/` · official website of BOSM
+### `code-duel/` · real-time 1v1 coding duels
 
-React · TanStack · Zustand · private repo
+private org · Next.js · Express · Socket.IO · Redis · PostgreSQL · Go · Docker
 
-The official website of **BOSM**, BITS Pilani's annual inter-college sports festival. I was one of the leads on the frontend team, and the edition the site served brought in **₹80L+ in revenue**.
+A platform for live one-on-one programming duels inside a timed contest. It runs as five services:
 
-### `code-duel/` · head-to-head Codeforces
+- **Frontend** (Next.js, Socket.IO, better-auth): the matchmaking queue, a duel arena with an editor and language picker, and a live leaderboard.
+- **Backend** (Express, Drizzle + PostgreSQL, Redis): the duel lifecycle over WebSockets (join/leave queue, run, submit, time-outs, disconnects, back-outs), with metrics and end-to-end tests.
+- **Matchmaking service** (TypeScript, Redis): pairs queued players by rating early in a contest and by contest score later, and waits briefly for a closer opponent before accepting a worse match.
+- **Remote code execution engine** (Go): judges C++, Java, Python and PyPy in Docker containers with time and memory limits and testlib checkers. Each language has a warm container pool that grows and shrinks with Redis queue depth. Ships with a load-test harness.
+- **Admin portal** (Django).
 
-private repo
+Scoring is Elo-based. The winner earns a minimum plus *K · (1 − expected score)*, so upsets pay more. Streak and speed bonuses are added, repeated wrong submissions are penalised, and the leaderboard is a Redis sorted set.
 
-1v1 duels on Codeforces problems, ranked by **our own Elo system**: your duel rating moves with every duel you win or lose, separate from your Codeforces rating.
+### `bosm/` · BOSM 2026 website
+
+private org repo · React · TanStack Router & Query · Zustand · GSAP · Firebase
+
+The official website of BOSM 2026, BITS Pilani's inter-college sports festival. Besides the public pages (sports, archives, guide), it runs **registration and payments** for three roles: participants, team captains and college representatives. Each role has its own dashboard, team management and a multi-step payment flow (bill → mode → confirm → redirect). Role-based route guards control access, and they're covered by tests. The site is a monorepo with a shared shadcn/ui package and a generated, typed API client.
 
 ### `entity-res/` · Amazon ML Challenge
 
-**[Amazon_ML_Challenge](https://github.com/devillish404/Amazon_ML_Challenge)** · Python · scikit-learn · XGBoost
+**[devillish404/Amazon_ML_Challenge](https://github.com/devillish404/Amazon_ML_Challenge)** · Python · scikit-learn · XGBoost
 
-Business entity resolution: find the same business across three noisy sources. The pipeline has two stages. Normalization and blocking cut the candidate pairs, then a gradient-boosted pair classifier (HistGradientBoosting or XGBoost) scores them on macro F<sub>0.5</sub>. **My part:** the Indic-script transliteration and normalization, and the blocking-analysis scripts for finding the pairs that blocking missed.
+Business entity resolution: find the same business across three noisy sources, using only the supplied data (no external lookups). The pipeline normalizes names and addresses, including transliterating Indic scripts. Blocking then generates candidate pairs, and a gradient-boosted classifier (HistGradientBoosting or XGBoost) scores them. The match threshold is tuned on an entity-level split against the competition's macro F<sub>0.5</sub>. Diagnostic scripts measure blocking recall and surface the true pairs it missed.
 
 <br>
 
