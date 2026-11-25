@@ -10,11 +10,35 @@
   },
   "verified": "2026-11-25",
   "audit": [
-    {"item": "paypilot",   "state": "EXECUTED",   "evidence": "41 of 69 commits · public repo · 29 test files"},
-    {"item": "bosm",       "state": "EXECUTED",   "evidence": "frontend lead · ₹80L+ edition · private repo"},
-    {"item": "code_duel",  "state": "EXECUTED",   "evidence": "custom Elo rating · private repo"},
-    {"item": "entity_res", "state": "EXECUTED",   "evidence": "Indic transliteration · public fork"},
-    {"item": "cf_rating",  "state": "RECONCILED", "evidence": "{cf_rating} · {cf_rank} · Codeforces API, weekly"},
-    {"item": "order_book", "state": "PENDING",    "evidence": "no evidence yet → not claimed"}
+    {
+      "item": "paypilot",
+      "state": "EXECUTED",
+      "evidence": "41 of 69 commits · public repo · 29 test files"
+    },
+    {
+      "item": "bosm",
+      "state": "EXECUTED",
+      "evidence": "frontend lead · ₹80L+ edition · private repo"
+    },
+    {
+      "item": "code_duel",
+      "state": "EXECUTED",
+      "evidence": "custom Elo rating · private repo"
+    },
+    {
+      "item": "entity_res",
+      "state": "EXECUTED",
+      "evidence": "Indic transliteration · public fork"
+    },
+    {
+      "item": "cf_rating",
+      "state": "RECONCILED",
+      "evidence": "{cf_rating} · {cf_rank} · Codeforces API, weekly"
+    },
+    {
+      "item": "order_book",
+      "state": "PENDING",
+      "evidence": "no evidence yet → not claimed"
+    }
   ]
 }
