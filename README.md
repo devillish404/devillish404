@@ -14,7 +14,7 @@
 
 I'm a third-year Computer Science student at BITS Pilani. Most of what I've shipped so far is product engineering: the official website of BOSM, BITS Pilani's sports fest, and a 1v1 Codeforces duel platform. The work I'm proudest of is about **correctness when things go wrong**: a payments engine you can `kill -9` mid-payment and it still won't pay twice.
 
-That's the thread I'm following down the stack, toward low-level C++ and the internals of LLM inference. I'm aiming at quant developer, systems and ML roles.
+That's the thread I'm following down the stack, toward low-level C++ and the internals of LLM inference. I'm aiming at **ML and systems** roles.
 
 <br>
 
