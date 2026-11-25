@@ -16,8 +16,6 @@ That's the thread I'm following down the stack, toward low-level C++ and the int
 
 <br>
 
-### `❯ devillish404 audit verify --all`
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/audit-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="assets/audit-light.svg">

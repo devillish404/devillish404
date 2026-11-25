@@ -45,10 +45,8 @@ THEMES = {
 STYLE = """<style>
   .m{font-family:%(mono)s} .s{font-family:%(sans)s}
   .cur{animation:blink 1.1s steps(1) infinite}
-  .in{animation:fade .5s ease-out both}
   @keyframes blink{50%%{opacity:0}}
-  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-  @media (prefers-reduced-motion: reduce){.cur,.in{animation:none}}
+  @media (prefers-reduced-motion: reduce){.cur{animation:none}}
 </style>""" % {"mono": MONO, "sans": SANS}
 
 
