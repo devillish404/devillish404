@@ -75,6 +75,10 @@ The official website of BOSM 2026, BITS Pilani's inter-college sports festival. 
 
 Business entity resolution: find the same business across three noisy sources, using only the supplied data (no external lookups). The pipeline normalizes names and addresses, including transliterating Indic scripts. Blocking then generates candidate pairs, and a gradient-boosted classifier (HistGradientBoosting or XGBoost) scores them. The match threshold is tuned on an entity-level split against the competition's macro F<sub>0.5</sub>. Diagnostic scripts measure blocking recall and surface the true pairs it missed.
 
+### `nalanda-scrapper/`
+
+private · Python
+
 <br>
 
 ## `❯ devillish404 --help`
